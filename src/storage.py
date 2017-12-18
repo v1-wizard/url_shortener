@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
 import time
 import uuid
 
-from tinydb import Query, TinyDB
+from tinydb import TinyDB, where
+
+from settings import USH_DB_PATH
 
 
-db = TinyDB('../data/links.json')
+db = TinyDB(USH_DB_PATH)
 
 
 class Link:
@@ -23,23 +23,26 @@ class Link:
         self.r_count = r_count or 0
         self.r_at = r_at
 
+    def to_dict(self):
+        return vars(self)
+
 
 class NotFoundException(Exception):
     pass
 
 
 def insert_link(link):
-    db.insert(link.__dict__)
+    db.insert(link.to_dict())
 
 
-async def update_link_stats(link):
+def update_link_stats(link):
     link.r_at = time.time()
     link.r_count += 1
-    db.update(link.__dict__, Query().lid == link.lid)
+    db.update(link.to_dict(), where('lid') == link.lid)
 
 
 def get_link(link_id):
-    results = db.search(Query().lid == link_id)
+    results = db.search(where('lid') == link_id)
     if len(results) == 0:
         raise NotFoundException()
 

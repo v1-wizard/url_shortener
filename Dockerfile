@@ -1,11 +1,17 @@
-FROM frolvlad/alpine-python3
+FROM python:3-alpine3.6
 
-MAINTAINER Aliaksei Boole <aliaksei.boole@gmail.com>
+LABEL maintainer="aliaksei.boole@gmail.com"
 
-RUN pip install aiohttp && pip install cerberus && pip install tinydb
+ARG APP_DIR=/var/app
 
-COPY ./app /app
-COPY ./data /data
-ENV PYTHONPATH=/
+COPY requirements.txt $APP_DIR/requirements.txt
+RUN pip3 install -r $APP_DIR/requirements.txt --no-cache-dir
+COPY src/ $APP_DIR/src/
+COPY data/ $APP_DIR/data/
 
-ENTRYPOINT ["python3", "/app/main.py"]
+ENV USH_PORT=7777
+ENV USH_DB_PATH=$APP_DIR/data/links.json
+
+WORKDIR $APP_DIR
+
+ENTRYPOINT ["python3", "src/main.py"]
