@@ -47,3 +47,7 @@ def get_link(link_id):
         raise NotFoundException()
 
     return Link(**results[0])
+
+
+def purge_all():
+    db.purge()

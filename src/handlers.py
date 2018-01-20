@@ -54,3 +54,14 @@ async def get_stats(request):
     return web.json_response(
         data={"last_redirected": link.r_at, "redirects_count": link.r_count}
     )
+
+
+async def purge_all(request):
+    try:
+        await request.json()
+
+    except JSONDecodeError:
+        raise web.HTTPNotAcceptable(reason="Invalid json")
+
+    storage.purge_all()
+    return web.HTTPOk()
