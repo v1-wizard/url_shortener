@@ -51,3 +51,8 @@ def get_link(link_id):
 
 def purge_all():
     db.purge()
+
+
+def get_all_links():
+    results = db.all()
+    return [Link(**result) for result in results]

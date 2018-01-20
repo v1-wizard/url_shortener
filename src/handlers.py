@@ -1,10 +1,8 @@
-from json import JSONDecodeError
 
 from aiohttp import web
 from cerberus import Validator
 
-import storage
-
+import helpers, storage
 
 async def redirect(request):
     link_id = request.match_info.get('link_id', None)
@@ -19,28 +17,18 @@ async def redirect(request):
 
 
 async def shortcut(request):
-    try:
-        json = await request.json()
-
-    except JSONDecodeError:
-        raise web.HTTPNotAcceptable(reason="Invalid json")
-
+    json = await helpers.get_json_from(request)
     v = Validator({'link': {'type': 'string'}})
     if not v.validate(json):
         raise web.HTTPBadRequest(reason=v.errors)
 
     link = storage.Link(link=json['link'])
     storage.insert_link(link)
-    return web.json_response(data={"id": link.lid})
+    return web.json_response(data={'id': link.lid})
 
 
 async def get_stats(request):
-    try:
-        json = await request.json()
-
-    except JSONDecodeError:
-        raise web.HTTPNotAcceptable(reason="Invalid json")
-
+    json = await helpers.get_json_from(request)
     v = Validator({'id': {'type': 'string'}})
     if not v.validate(json):
         raise web.HTTPBadRequest(reason=v.errors)
@@ -52,16 +40,22 @@ async def get_stats(request):
         raise web.HTTPNotFound()
 
     return web.json_response(
-        data={"last_redirected": link.r_at, "redirects_count": link.r_count}
+        data={'last_redirected': link.r_at, 'redirects_count': link.r_count}
     )
 
 
 async def purge_all(request):
-    try:
-        await request.json()
-
-    except JSONDecodeError:
-        raise web.HTTPNotAcceptable(reason="Invalid json")
+    json = await helpers.get_json_from(request)
+    v = Validator({'Are you sure?': {'type': 'string'}})
+    if not v.validate(json) or not json['Are you sure?'].lower() == 'yes':
+        raise web.HTTPBadRequest(reason='You must confirm your action.')
 
     storage.purge_all()
     return web.HTTPOk()
+
+
+async def get_all_links(request):
+    links = storage.get_all_links()
+    return web.json_response(
+        data={'links': {link.lid: link.link for link in links}}
+    )
