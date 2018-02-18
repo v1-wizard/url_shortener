@@ -18,7 +18,13 @@ async def redirect(request):
 
 async def shortcut(request):
     json = await helpers.get_json_from(request)
-    v = Validator({'link': {'type': 'string'}})
+    v = Validator({
+        'link': {
+            'type': 'string',
+            'regex': ('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
+                      '(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+        }
+    })
     if not v.validate(json):
         raise web.HTTPBadRequest(reason=v.errors)
 
