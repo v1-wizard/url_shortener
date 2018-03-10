@@ -25,7 +25,7 @@ docker run --rm --name=url_shorter -e USH_PORT=7776 -p 8888:7776 url_shorter:lat
 ```
 4. Remove all data from db
 ```
-➜  ~ curl -X DELETE -d '{"Are you sure?":"Yes"}' http://localhost:8888/admin/all_links
+➜  ~ curl -X DELETE -d '{"confirm":"Yes"}' http://localhost:8888/admin/all_links
 200: OK%
 ```
 5. Get map all links

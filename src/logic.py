@@ -48,16 +48,16 @@ def get_stats(json_body):
     )
 
 
-def purge_all(json_body=None):
+def purge_all(json_body):
     v = Validator({
-        'Are you sure?': {
+        'confirm': {
             'type': 'string',
             'empty': False,
             'required': True,
             'allowed': ['yes', 'Yes', 'YES']
         },
     })
-    if not v.validate(json):
+    if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
     storage.purge_all()
