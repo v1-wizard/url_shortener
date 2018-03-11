@@ -15,7 +15,7 @@ docker run --rm --name=url_shorter -e USH_PORT=7776 -p 8888:7776 url_shorter:lat
 ```
 ```
 ➜  ~ ws ws://127.0.0.1:8888/ws
-> {"type":"shortcut","body":{"link":"http://example.com"}}
+> {"command":"shortcut","body":{"link":"http://example.com"}}
 < {"code": 200, "body": {"id": "c3f1dece-4cb4-481c-bd32-3d56045f0a79"}}
 ```
 2. Get last redirect timestamp and count of redirects
@@ -25,7 +25,7 @@ docker run --rm --name=url_shorter -e USH_PORT=7776 -p 8888:7776 url_shorter:lat
 ```
 ```
 ➜  ~ ws ws://127.0.0.1:8888/ws
-> {"type":"get_stats","body":{"id":"c3f1dece-4cb4-481c-bd32-3d56045f0a79"}}
+> {"command":"get_stats","body":{"id":"c3f1dece-4cb4-481c-bd32-3d56045f0a79"}}
 < {"code": 200, "body": {"last_redirected": null, "redirects_count": 0}}
 ```
 3. Redirect to real link
@@ -40,7 +40,7 @@ docker run --rm --name=url_shorter -e USH_PORT=7776 -p 8888:7776 url_shorter:lat
 ```
 ```
 ➜  ~ ws ws://127.0.0.1:8888/ws
-> {"type":"purge_all","body":{"confirm":"yes"}}
+> {"command":"purge_all","body":{"confirm":"yes"}}
 < {"code": 200, "body": {}}
 
 ```
@@ -51,6 +51,6 @@ docker run --rm --name=url_shorter -e USH_PORT=7776 -p 8888:7776 url_shorter:lat
 ```
 ```
 ➜  ~ ws ws://127.0.0.1:8888/ws
-> {"type":"get_all_links","body":{}}
+> {"command":"get_all_links","body":{}}
 < {"code": 200, "body": {"links": {"c3f1dece-4cb4-481c-bd32-3d56045f0a79": "http://example.com"}}}
 ```

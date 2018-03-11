@@ -1,13 +1,17 @@
+import logging
 from json import JSONDecodeError
 
 from aiohttp import web, WSMsgType
 
-import logic
+import views
+
+
+logger = logging.getLogger(__name__)
 
 
 async def redirect(request):
     link_id = request.match_info.get('link_id', None)
-    return logic.redirect(link_id)
+    return views.redirect(link_id)
 
 
 async def shortcut(request):
@@ -16,7 +20,7 @@ async def shortcut(request):
     except JSONDecodeError:
         raise web.HTTPNotAcceptable(reason="Invalid json")
 
-    return logic.shortcut(json_body)
+    return views.shortcut(json_body)
 
 
 async def get_stats(request):
@@ -25,7 +29,7 @@ async def get_stats(request):
     except JSONDecodeError:
         raise web.HTTPNotAcceptable(reason="Invalid json")
 
-    return logic.get_stats(json_body)
+    return views.get_stats(json_body)
 
 
 async def purge_all(request):
@@ -34,11 +38,11 @@ async def purge_all(request):
     except JSONDecodeError:
         raise web.HTTPNotAcceptable(reason="Invalid json")
 
-    return logic.purge_all(json_body)
+    return views.purge_all(json_body)
 
 
 async def get_all_links(request):
-    return logic.get_all_links()
+    return views.get_all_links()
 
 
 async def websocket_handler(request):
@@ -47,14 +51,18 @@ async def websocket_handler(request):
 
     async for msg in ws:
         if msg.type == WSMsgType.TEXT:
-            resp = logic.do_ws_logic(msg.data)
+            resp = views.do_ws_logic(msg.data)
             await ws.send_str(resp)
         elif msg.type == WSMsgType.ERROR:
-            print('Connection closed with exception {}'.format(ws.exception()))
+            logger.error(
+                'Connection closed with exception {}'.format(ws.exception())
+            )
         elif msg.type == WSMsgType.CLOSE:
             ws.close()
         else:
-            print(msg.data)
+            logger.error(
+                'Unexpected msg type {} were received'.format(msg.type)
+            )
 
-    print('Ws connection closed')
+    logger.debug('Ws connection closed')
     return ws

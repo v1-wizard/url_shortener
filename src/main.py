@@ -1,10 +1,12 @@
+import logging.config
+
 from aiohttp import web
 
 import handlers, middlewares
-from settings import USH_PORT
+from settings import LOGGER_CONF_PATH, USH_PORT
 
 
-def main():
+def get_application():
     app = web.Application(middlewares=[middlewares.process_error])
 
     app.router.add_get('/r/{link_id}', handlers.redirect)
@@ -16,8 +18,10 @@ def main():
 
     app.router.add_get('/ws', handlers.websocket_handler)
 
-    web.run_app(app, port=USH_PORT)
+    return app
 
 
 if __name__ == '__main__':
-    main()
+    logging.config.fileConfig(LOGGER_CONF_PATH)
+    app = get_application()
+    web.run_app(app, port=USH_PORT)

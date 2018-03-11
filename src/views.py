@@ -3,7 +3,7 @@ import json
 from aiohttp import web
 from cerberus import Validator
 
-import storage
+import storage, schemas
 
 
 def redirect(link_id):
@@ -16,15 +16,7 @@ def redirect(link_id):
 
 
 def shortcut(json_body):
-    v = Validator({
-        'link': {
-            'type': 'string',
-            'regex': ('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
-                      '(?:%[0-9a-fA-F][0-9a-fA-F]))+'),
-            'empty': False,
-            'required': True,
-        },
-    })
+    v = Validator(schemas.SHORTCUT)
     if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
@@ -34,7 +26,7 @@ def shortcut(json_body):
 
 
 def get_stats(json_body):
-    v = Validator({'id': {'type': 'string', 'empty': False, 'required': True}})
+    v = Validator(schemas.GET_STATS)
     if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
@@ -49,14 +41,7 @@ def get_stats(json_body):
 
 
 def purge_all(json_body):
-    v = Validator({
-        'confirm': {
-            'type': 'string',
-            'empty': False,
-            'required': True,
-            'allowed': ['yes', 'Yes', 'YES']
-        },
-    })
+    v = Validator(schemas.PURGE_ALL)
     if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
@@ -95,23 +80,11 @@ def _validate_and_extract_from(ws_msg):
     except json.JSONDecodeError:
         raise web.HTTPNotAcceptable(reason="Invalid json")
 
-    v = Validator({
-        'type': {
-            'type': 'string',
-            'empty': False,
-            'required': True,
-            'allowed': list(_LOGIC_MAPPER.keys()),
-        },
-        'body': {
-            'type': 'dict',
-            'required': True,
-        },
-    })
-
+    v = Validator(schemas.WEB_SOCKET_MSG)
     if not v.validate(json_data):
         raise web.HTTPBadRequest(reason=v.errors)
 
-    return json_data['type'], json_data['body']
+    return json_data['command'], json_data['body']
 
 
 def _convert_to_ws_err_msg(err):
