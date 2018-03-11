@@ -54,3 +54,6 @@ docker run --rm --name=url_shorter -e USH_PORT=7776 -p 8888:7776 url_shorter:lat
 > {"command":"get_all_links","body":{}}
 < {"code": 200, "body": {"links": {"c3f1dece-4cb4-481c-bd32-3d56045f0a79": "http://example.com"}}}
 ```
+
+# Links
+* https://github.com/hashrocket/ws - websocket cli for exploring and debugging.  
