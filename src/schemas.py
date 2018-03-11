@@ -10,7 +10,13 @@ SHORTCUT = {
     },
 }
 
-GET_STATS = {'id': {'type': 'string', 'empty': False, 'required': True}}
+GET_STATS = {
+    'id': {
+        'type': 'string',
+        'empty': False,
+        'required': True
+    }
+}
 
 PURGE_ALL = {
     'confirm': {
@@ -22,14 +28,14 @@ PURGE_ALL = {
 }
 
 WEB_SOCKET_MSG = {
-        'command': {
-            'type': 'string',
-            'empty': False,
-            'required': True,
-            'allowed': ['shortcut', 'get_stats', 'purge_all', 'get_all_links'],
-        },
-        'body': {
-            'type': 'dict',
-            'required': True,
-        },
-    }
+    'command': {
+        'type': 'string',
+        'empty': False,
+        'required': True,
+        'allowed': ['shortcut', 'get_stats', 'purge_all', 'get_all_links'],
+    },
+    'body': {
+        'type': 'dict',
+        'required': True,
+    },
+}
