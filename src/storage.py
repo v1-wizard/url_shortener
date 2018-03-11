@@ -1,6 +1,5 @@
-import random
-import string
 import time
+import uuid
 
 from tinydb import TinyDB, where
 
@@ -19,18 +18,8 @@ class Link:
         :param r_count: redirect count
         :param r_at: last time when link was used in timestamp format
         """
-
-        def generate_lid():
-            random_chars = []
-            for _ in range(10):
-                random_chars.append(
-                    random.choice(string.ascii_lowercase + string.digits)
-                )
-
-            return ''.join(random_chars)
-
         self.link = link
-        self.lid = lid or generate_lid()
+        self.lid = lid or uuid.uuid4().hex[:10]
         self.r_count = r_count or 0
         self.r_at = r_at
 
