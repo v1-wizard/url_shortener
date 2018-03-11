@@ -19,7 +19,7 @@ class Link:
         :param r_at: last time when link was used in timestamp format
         """
         self.link = link
-        self.lid = lid or str(uuid.uuid4())
+        self.lid = lid or uuid.uuid4().hex[:10]
         self.r_count = r_count or 0
         self.r_at = r_at
 
