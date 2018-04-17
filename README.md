@@ -3,8 +3,7 @@ Yet another url shortener
 
 # Getting started
 ```
-docker build -t "url_shorter:latest" .
-docker run --rm --name=url_shorter -e USH_PORT=7776 -p 8888:7776 url_shorter:latest
+docker-compose up -d
 ```
 
 # API

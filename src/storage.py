@@ -1,12 +1,13 @@
 import time
 import uuid
 
-from tinydb import TinyDB, where
+from pymongo import MongoClient
 
-from settings import USH_DB_PATH
+from settings import USH_MONGO_CON_STRING
 
 
-db = TinyDB(USH_DB_PATH)
+client = MongoClient(USH_MONGO_CON_STRING)
+link_collection = client.db.links
 
 
 class Link:
@@ -32,27 +33,29 @@ class NotFoundException(Exception):
 
 
 def insert_link(link):
-    db.insert(link.to_dict())
+    link_collection.insert_one(link.to_dict())
 
 
 def update_link_stats(link):
     link.r_at = time.time()
     link.r_count += 1
-    db.update(link.to_dict(), where('lid') == link.lid)
+    link_collection.update_one(
+        {'lid': link.lid}, {'$set': link.to_dict()}, upsert=False
+    )
 
 
 def get_link(link_id):
-    results = db.search(where('lid') == link_id)
-    if len(results) == 0:
+    result = link_collection.find_one({'lid': link_id}, {'_id': False})
+    if not result:
         raise NotFoundException()
 
-    return Link(**results[0])
+    return Link(**result)
 
 
 def purge_all():
-    db.purge()
+    link_collection.delete_many({})
 
 
 def get_all_links():
-    results = db.all()
+    results = link_collection.find({}, {'_id': False})
     return [Link(**result) for result in results]
