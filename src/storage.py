@@ -1,12 +1,12 @@
 import time
 import uuid
 
-import motor.motor_asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
 
 from settings import USH_MONGO_CON_STRING
 
 
-client = motor.motor_asyncio.AsyncIOMotorClient(USH_MONGO_CON_STRING)
+client = AsyncIOMotorClient(USH_MONGO_CON_STRING)
 
 
 class Link:
