@@ -2,6 +2,8 @@ version: "3"
 services:
   app:
     build: .
+    depends_on:
+      - mongo
     environment:
       USH_PORT: 8888
       USH_MONGO_CON_STRING: mongodb://mongo:27017

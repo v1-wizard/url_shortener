@@ -1,6 +1,6 @@
 import os
 
-USH_PORT = int(os.environ.get('USH_PORT', 7777))
+USH_PORT = int(os.environ.get('USH_PORT', 8888))
 USH_MONGO_CON_STRING = os.environ.get(
     'USH_MONGO_CON_STRING', 'mongodb://localhost:27017/'
 )

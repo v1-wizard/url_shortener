@@ -4,23 +4,23 @@ from cerberus import Validator
 import storage, schemas
 
 
-def shortcut(json_body):
+async def shortcut(json_body):
     v = Validator(schemas.SHORTCUT)
     if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
-    link = storage.Link(link=json_body['link'])
-    storage.insert_link(link)
+    link = storage.Link(link=json_body1['link'])
+    await storage.insert_link(link)
     return web.json_response(data={'id': link.lid})
 
 
-def get_stats(json_body):
+async def get_stats(json_body):
     v = Validator(schemas.GET_STATS)
     if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
     try:
-        link = storage.get_link(json_body['id'])
+        link = await storage.get_link(json_body['id'])
     except storage.NotFoundException:
         raise web.HTTPNotFound()
 
@@ -29,17 +29,17 @@ def get_stats(json_body):
     )
 
 
-def purge_all(json_body):
+async def purge_all(json_body):
     v = Validator(schemas.PURGE_ALL)
     if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
-    storage.purge_all()
+    await storage.purge_all()
     return web.json_response(data={})
 
 
-def get_all_links(json_body=None):
-    links = storage.get_all_links()
+async def get_all_links(json_body=None):
+    links = await storage.get_all_links()
     return web.json_response(
         data={'links': {link.lid: link.link for link in links}}
     )

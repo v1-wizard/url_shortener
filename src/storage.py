@@ -1,13 +1,12 @@
 import time
 import uuid
 
-from pymongo import MongoClient
+import motor.motor_asyncio
 
 from settings import USH_MONGO_CON_STRING
 
 
-client = MongoClient(USH_MONGO_CON_STRING)
-link_collection = client.db.links
+client = motor.motor_asyncio.AsyncIOMotorClient(USH_MONGO_CON_STRING)
 
 
 class Link:
@@ -32,30 +31,31 @@ class NotFoundException(Exception):
     pass
 
 
-def insert_link(link):
-    link_collection.insert_one(link.to_dict())
+async def insert_link(link):
+    await client.db.links.insert_one(link.to_dict())
 
 
-def update_link_stats(link):
+async def update_link_stats(link):
     link.r_at = time.time()
     link.r_count += 1
-    link_collection.update_one(
+    await client.db.links.update_one(
         {'lid': link.lid}, {'$set': link.to_dict()}, upsert=False
     )
 
 
-def get_link(link_id):
-    result = link_collection.find_one({'lid': link_id}, {'_id': False})
-    if not result:
+async def get_link(link_id):
+    document = await client.db.links.find_one({'lid': link_id}, {'_id': False})
+    if not document:
         raise NotFoundException()
 
-    return Link(**result)
+    return Link(**document)
 
 
-def purge_all():
-    link_collection.delete_many({})
+async def purge_all():
+    await client.db.links.delete_many({})
 
 
-def get_all_links():
-    results = link_collection.find({}, {'_id': False})
-    return [Link(**result) for result in results]
+async def get_all_links():
+    cursor = client.db.links.find({}, {'_id': False})
+    links = [Link(**document) for document in await cursor.to_list(777)]
+    return links
