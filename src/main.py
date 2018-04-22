@@ -3,7 +3,7 @@ import logging.config
 from aiohttp import web
 
 import middlewares, views
-from settings import LOGGER_CONF_PATH, USH_PORT
+from settings import USH_LOGGER_CONF_PATH, USH_PORT
 
 
 def get_application():
@@ -22,6 +22,6 @@ def get_application():
 
 
 if __name__ == '__main__':
-    logging.config.fileConfig(LOGGER_CONF_PATH)
+    logging.config.fileConfig(USH_LOGGER_CONF_PATH)
     app = get_application()
-    web.run_app(app, port=USH_PORT)
+    web.run_app(app, port=USH_PORT, access_log=logging.getLogger())

@@ -102,3 +102,6 @@ ENV/
 
 # PyCharm
 .idea
+
+#Mongo data
+data

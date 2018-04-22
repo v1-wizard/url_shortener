@@ -1,12 +1,12 @@
 import time
 import uuid
 
-from tinydb import TinyDB, where
+from motor.motor_asyncio import AsyncIOMotorClient
 
-from settings import USH_DB_PATH
+from settings import USH_MONGO_CON_STRING
 
 
-db = TinyDB(USH_DB_PATH)
+client = AsyncIOMotorClient(USH_MONGO_CON_STRING)
 
 
 class Link:
@@ -31,28 +31,31 @@ class NotFoundException(Exception):
     pass
 
 
-def insert_link(link):
-    db.insert(link.to_dict())
+async def insert_link(link):
+    await client.db.links.insert_one(link.to_dict())
 
 
-def update_link_stats(link):
+async def update_link_stats(link):
     link.r_at = time.time()
     link.r_count += 1
-    db.update(link.to_dict(), where('lid') == link.lid)
+    await client.db.links.update_one(
+        {'lid': link.lid}, {'$set': link.to_dict()}, upsert=False
+    )
 
 
-def get_link(link_id):
-    results = db.search(where('lid') == link_id)
-    if len(results) == 0:
+async def get_link(link_id):
+    document = await client.db.links.find_one({'lid': link_id}, {'_id': False})
+    if not document:
         raise NotFoundException()
 
-    return Link(**results[0])
+    return Link(**document)
 
 
-def purge_all():
-    db.purge()
+async def purge_all():
+    await client.db.links.delete_many({})
 
 
-def get_all_links():
-    results = db.all()
-    return [Link(**result) for result in results]
+async def get_all_links():
+    cursor = client.db.links.find({}, {'_id': False})
+    links = [Link(**document) for document in await cursor.to_list(777)]
+    return links

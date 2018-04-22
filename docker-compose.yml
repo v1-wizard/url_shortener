@@ -1,0 +1,22 @@
+version: "3"
+services:
+  app:
+    build: .
+    depends_on:
+      - mongo
+    environment:
+      USH_PORT: 8888
+      USH_MONGO_CON_STRING: mongodb://mongo:27017
+    ports:
+      - 8888:8888
+  mongo:
+      image: mongo:3.6.3
+      environment:
+        - MONGO_DATA_DIR=/data/db
+        - MONGO_LOG_DIR=/data/logs
+      volumes:
+        - ./data/db:/data/db
+        - ./data/logs:/data/logs
+      ports:
+        - 27017:27017
+      command: mongod --smallfiles

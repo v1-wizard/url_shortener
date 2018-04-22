@@ -21,10 +21,10 @@ async def handler(request):
             try:
                 command, body = _validate_and_extract_from(msg.data)
                 action = _LOGIC_MAPPER[command]
-                http_resp = action(body)
+                http_resp = await action(body)
                 resp = _convert_to_ws_msg(http_resp)
             except web.HTTPError as err:
-                resp =  _convert_to_ws_err_msg(err)
+                resp = _convert_to_ws_err_msg(err)
 
             await ws.send_str(resp)
         elif msg.type == WSMsgType.ERROR:
