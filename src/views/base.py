@@ -9,7 +9,7 @@ async def shortcut(json_body):
     if not v.validate(json_body):
         raise web.HTTPBadRequest(reason=v.errors)
 
-    link = storage.Link(link=json_body1['link'])
+    link = storage.Link(link=json_body['link'])
     await storage.insert_link(link)
     return web.json_response(data={'id': link.lid})
 
